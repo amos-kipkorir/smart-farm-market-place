@@ -41,7 +41,7 @@ def run_seed():
         
         # Realistic agricultural products with proper images
         product_data = [
-            {"name": "Fresh Tomatoes", "category": "vegetables", "price": 45, "image": "https://images.unsplash.com/photo-1546470427-e5d491d7e4b8?w=400&h=300&fit=crop"},
+            {"name": "Fresh Tomatoes", "category": "vegetables", "price": 45, "image": "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=400&h=300&fit=crop"},
             {"name": "Organic Carrots", "category": "vegetables", "price": 35, "image": "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=400&h=300&fit=crop"},
             {"name": "Sweet Bananas", "category": "fruits", "price": 25, "image": "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=400&h=300&fit=crop"},
             {"name": "Fresh Avocados", "category": "fruits", "price": 80, "image": "https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=400&h=300&fit=crop"},
