@@ -109,6 +109,9 @@ SECRET_KEY=your_secret_key
 
 * `ws://server-address/chat` - WebSocket endpoint for real-time messaging
 
+**Backend live link**
+`https://smart-farm-market-place.onrender.com/api/products`
+
 *(Adjust endpoints based on your implementation)*
 
 ## Project Structure
@@ -148,6 +151,7 @@ AgriConnect+/
 
 ## Authors
   Amos Kipkorir
+  and
   Tasha Kuria
 
 ## License
