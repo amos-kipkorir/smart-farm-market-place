@@ -2,6 +2,7 @@
 import axios from 'axios';
 
 const API_BASE_URL = 'https://smart-farm-market-place.onrender.com/'; 
+ 
 
 const api = axios.create({
   baseURL: API_BASE_URL,

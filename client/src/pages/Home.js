@@ -34,11 +34,21 @@ const Home = () => {
               )}
             </Col>
             <Col md={6}>
-              <img 
-                src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
-                alt="Farm fresh products" 
-                className="img-fluid rounded"
-              />
+              <div className="position-relative">
+                <img 
+                  key="farm-gif-v4"
+                  src="https://media.giphy.com/media/l0HlBO7eyXzSZkJri/giphy.gif" 
+                  alt="Agricultural farming process" 
+                  className="img-fluid rounded shadow"
+                  style={{ maxHeight: '400px', width: '100%', objectFit: 'cover' }}
+                />
+                <div className="position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-10 rounded d-flex align-items-center justify-content-center">
+                  <div className="text-center text-white">
+                    <h3 className="fw-bold mb-2 text-shadow">🌾 Fresh from Farm</h3>
+                    <p className="mb-0 text-shadow">Direct • Quality • Sustainable</p>
+                  </div>
+                </div>
+              </div>
             </Col>
           </Row>
         </Container>
@@ -55,10 +65,20 @@ const Home = () => {
           </Row>
           <Row>
             <Col md={4} className="mb-4">
-              <Card className="h-100 text-center">
-                <Card.Body>
-                  <div className="fs-1 mb-3">👨‍🌾</div>
-                  <Card.Title>For Farmers</Card.Title>
+              <Card className="h-100 border-0 shadow-sm">
+                <div className="position-relative">
+                  <img 
+                    src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=200&fit=crop" 
+                    alt="Farmer with crops" 
+                    className="card-img-top"
+                    style={{ height: '200px', objectFit: 'cover' }}
+                  />
+                  <div className="position-absolute top-0 end-0 m-2">
+                    <span className="badge bg-success fs-6">👨🌾</span>
+                  </div>
+                </div>
+                <Card.Body className="text-center">
+                  <Card.Title className="text-success">For Farmers</Card.Title>
                   <Card.Text>
                     Reach more customers, get fair prices, and grow your business with our platform.
                   </Card.Text>
@@ -66,10 +86,20 @@ const Home = () => {
               </Card>
             </Col>
             <Col md={4} className="mb-4">
-              <Card className="h-100 text-center">
-                <Card.Body>
-                  <div className="fs-1 mb-3">🛒</div>
-                  <Card.Title>For Buyers</Card.Title>
+              <Card className="h-100 border-0 shadow-sm">
+                <div className="position-relative">
+                  <img 
+                    src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&h=200&fit=crop" 
+                    alt="Fresh vegetables market" 
+                    className="card-img-top"
+                    style={{ height: '200px', objectFit: 'cover' }}
+                  />
+                  <div className="position-absolute top-0 end-0 m-2">
+                    <span className="badge bg-primary fs-6">🛒</span>
+                  </div>
+                </div>
+                <Card.Body className="text-center">
+                  <Card.Title className="text-primary">For Buyers</Card.Title>
                   <Card.Text>
                     Get fresh products directly from farmers with competitive prices and quality guarantee.
                   </Card.Text>
@@ -77,10 +107,20 @@ const Home = () => {
               </Card>
             </Col>
             <Col md={4} className="mb-4">
-              <Card className="h-100 text-center">
-                <Card.Body>
-                  <div className="fs-1 mb-3">💳</div>
-                  <Card.Title>Secure Payments</Card.Title>
+              <Card className="h-100 border-0 shadow-sm">
+                <div className="position-relative">
+                  <img 
+                    src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=200&fit=crop" 
+                    alt="Mobile payment" 
+                    className="card-img-top"
+                    style={{ height: '200px', objectFit: 'cover' }}
+                  />
+                  <div className="position-absolute top-0 end-0 m-2">
+                    <span className="badge bg-warning fs-6">💳</span>
+                  </div>
+                </div>
+                <Card.Body className="text-center">
+                  <Card.Title className="text-warning">Secure Payments</Card.Title>
                   <Card.Text>
                     Safe and secure M-Pesa integration for seamless transactions.
                   </Card.Text>
