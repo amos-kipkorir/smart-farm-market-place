@@ -3,7 +3,7 @@
 **An evolution of the Agriconnect concept**
 A modern marketplace connecting farmers and buyers, with real-time communication and mobile-friendly access.
 
-**Live Backend API:** `https://smart-farm-market-place.onrender.com`
+**Live Backend API:** https://smart-farm-market-place.onrender.com
 
 ## Table of Contents
 
