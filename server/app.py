@@ -14,7 +14,11 @@ db.init_app(app)
 CORS(app)
 migrate = Migrate(app, db)
 
-
+# Home route
+@app.route('/', methods=['GET'])
+@app.route('/api', methods=['GET'])
+def home():
+    return jsonify({'message': 'Welcome to Smart Farm Market Place'}), 200
 
 # JWT authentication decorator
 def token_required(f):
