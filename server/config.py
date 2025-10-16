@@ -1,7 +1,9 @@
 import os
 from datetime import timedelta
+from dotenv import load_dotenv
 
 basedir = os.path.abspath(os.path.dirname(__file__))
+load_dotenv()  # Load environment variables from .env file
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'agriconnect-secret-key'

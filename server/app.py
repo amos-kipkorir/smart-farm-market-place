@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from models import db, User, Product, Order, OrderItem, ChatMessage, Review
+from models import db, User, Product, Order, OrderItem, ChatMessage, Review, Payment
 from config import Config
 from flask_migrate import Migrate
 
@@ -287,15 +287,39 @@ def create_order(current_user):
     db.session.add(order)
     db.session.commit()
     
-    # For now, skip M-Pesa integration and mark order as pending
-    order.status = 'pending'
-    
-    return jsonify({
-        'order_id': order.id,
-        'message': 'Order placed successfully',
-        'status': order.status,
-        'total_amount': total_amount
-    }), 201
+    # Initiate M-Pesa STK Push
+    try:
+        from mpesa_stk import stk_push
+        mpesa_response = stk_push(data['phone_number'], int(total_amount), order.id)
+        
+        if mpesa_response.get('ResponseCode') == '0':
+            order.status = 'pending_payment'
+            db.session.commit()
+            return jsonify({
+                'order_id': order.id,
+                'message': 'Order placed successfully. Please complete payment on your phone.',
+                'status': order.status,
+                'total_amount': total_amount,
+                'mpesa_checkout_id': mpesa_response.get('CheckoutRequestID')
+            }), 201
+        else:
+            order.status = 'payment_failed'
+            db.session.commit()
+            return jsonify({
+                'order_id': order.id,
+                'message': 'Order created but payment initiation failed',
+                'status': order.status,
+                'error': mpesa_response.get('errorMessage')
+            }), 400
+    except Exception as e:
+        order.status = 'pending'
+        db.session.commit()
+        return jsonify({
+            'order_id': order.id,
+            'message': 'Order placed successfully (M-Pesa unavailable)',
+            'status': order.status,
+            'total_amount': total_amount
+        }), 201
 
 # Get orders
 @app.route('/api/orders', methods=['GET'])
@@ -387,33 +411,80 @@ def update_order(current_user, order_id):
         'status': order.status
     }), 200
 
+# Initiate M-Pesa payment for existing order
+@app.route('/api/orders/<int:order_id>/pay', methods=['POST'])
+@token_required
+def initiate_payment(current_user, order_id):
+    order = Order.query.get_or_404(order_id)
+    
+    if order.buyer_id != current_user.id:
+        return jsonify({'message': 'Access denied'}), 403
+        
+    if order.status == 'confirmed':
+        return jsonify({'message': 'Order already paid'}), 400
+        
+    try:
+        from mpesa_stk import stk_push
+        mpesa_response = stk_push(order.phone_number, int(order.total_amount), order.id)
+        
+        if mpesa_response.get('ResponseCode') == '0':
+            order.status = 'pending_payment'
+            db.session.commit()
+            return jsonify({
+                'message': 'Payment initiated. Please complete on your phone.',
+                'checkout_id': mpesa_response.get('CheckoutRequestID')
+            }), 200
+        else:
+            return jsonify({
+                'message': 'Payment initiation failed',
+                'error': mpesa_response.get('errorMessage')
+            }), 400
+    except Exception as e:
+        return jsonify({'message': f'Payment service unavailable: {str(e)}'}), 503
+
 # MPesa callback endpoint
 @app.route('/api/mpesa-callback', methods=['POST'])
 def mpesa_callback():
     data = request.get_json()
     
-    # Extract order ID from account reference
     try:
-        callback_metadata = data['Body']['stkCallback']['CallbackMetadata']['Item']
-        account_reference = next(item['Value'] for item in callback_metadata if item.get('Name') == 'AccountReference')
-        order_id = int(account_reference.replace('ORDER', ''))
+        stk_callback = data['Body']['stkCallback']
+        result_code = stk_callback['ResultCode']
         
-        # Find the order
-        order = Order.query.get(order_id)
-        if not order:
-            return jsonify({'message': 'Order not found'}), 404
+        if result_code == 0:  # Success
+            callback_metadata = stk_callback['CallbackMetadata']['Item']
             
-        # Update order status and MPesa receipt
-        order.status = 'confirmed'
-        mpesa_receipt = next(item['Value'] for item in callback_metadata if item.get('Name') == 'MpesaReceiptNumber')
-        order.mpesa_receipt = mpesa_receipt
+            # Extract payment details
+            account_reference = next(item['Value'] for item in callback_metadata if item.get('Name') == 'AccountReference')
+            order_id = int(account_reference.replace('ORDER', ''))
+            mpesa_receipt = next(item['Value'] for item in callback_metadata if item.get('Name') == 'MpesaReceiptNumber')
+            
+            # Find and update the order
+            order = Order.query.get(order_id)
+            if order:
+                order.status = 'confirmed'
+                order.mpesa_receipt = mpesa_receipt
+                
+                # Save payment record
+                payment = Payment(
+                    phone=order.phone_number,
+                    mpesa_code=mpesa_receipt,
+                    amount=order.total_amount,
+                    status='Success'
+                )
+                db.session.add(payment)
+                db.session.commit()
+                
+        else:  # Payment failed
+            # Extract order ID even for failed payments
+            checkout_request_id = stk_callback.get('CheckoutRequestID')
+            # You might want to store this ID when creating orders to match failed payments
+            
+        return jsonify({'ResultCode': 0, 'ResultDesc': 'Accepted'}), 200
         
-        db.session.commit()
-        
-        return jsonify({'message': 'Callback processed successfully'}), 200
     except Exception as e:
         app.logger.error(f"Error processing MPesa callback: {e}")
-        return jsonify({'message': 'Error processing callback'}), 400
+        return jsonify({'ResultCode': 1, 'ResultDesc': 'Error processing callback'}), 400
 
 # Get chat messages between users
 @app.route('/api/chat/<int:other_user_id>', methods=['GET'])

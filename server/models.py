@@ -89,3 +89,12 @@ class ChatMessage(SerializerMixin, db.Model):
     message = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     read = db.Column(db.Boolean, default=False)
+
+class Payment(SerializerMixin, db.Model):
+    __tablename__ = 'payments'
+    id = db.Column(db.Integer, primary_key=True)
+    phone = db.Column(db.String(20))
+    mpesa_code = db.Column(db.String(20))
+    amount = db.Column(db.Numeric(10, 2))
+    status = db.Column(db.String(20))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
